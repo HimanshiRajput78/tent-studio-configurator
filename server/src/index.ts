@@ -12,7 +12,12 @@ const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 const MAX_PREVIEW_BYTES = 2.5 * 1024 * 1024;
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://tent-studio-configurator.vercel.app"
+  ]
+}));
 // 4 cart items × 2.5 MB maximum image payload, plus JSON overhead.
 app.use(express.json({ limit: "15mb" }));
 
