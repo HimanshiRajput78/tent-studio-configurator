@@ -1,0 +1,150 @@
+
+.design-editor {
+  background: #ffffff;
+  padding: 24px;
+  margin-top: 25px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.editor-header h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.editor-header p {
+  color: #777;
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
+.editor-status {
+  font-size: 11px;
+  color: #16834a;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.editor-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.editor-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editor-field input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.editor-field input[type="file"] {
+  width: 100%;
+  font-size: 12px;
+}
+
+.editor-field input[type="color"] {
+  width: 55px;
+  height: 38px;
+  padding: 3px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.editor-field input[type="range"] {
+  width: 100%;
+  accent-color: #222;
+}
+
+.editor-secondary-button {
+  padding: 11px 14px;
+  background: #242424;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.editor-secondary-button:hover {
+  background: #444;
+}
+
+.editor-canvas-section {
+  min-width: 0;
+  background: #f5f5f6;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.canvas-instruction {
+  color: #666;
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.design-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.design-canvas:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 750px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 450px) {
+  .design-editor {
+    padding: 14px;
+  }
+
+  .editor-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-header h2 {
+    font-size: 18px;
+  }
+}
