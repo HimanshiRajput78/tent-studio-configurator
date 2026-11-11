@@ -259,6 +259,214 @@ function loadImage(
   });
 }
 
+
+/**
+ * Estimate how the island's U and V axes point in world space.
+ * This is calculated from the actual mesh vertices and UV coordinates,
+ * rather than assigning guessed rotations to panel names.
+ */
+function getIslandWorldUVAxes(
+  mesh: Mesh,
+  island: UVIsland
+): { uAxis: Vector3; vAxis: Vector3 } | null {
+  const position = mesh.geometry.getAttribute("position");
+  const uv = mesh.geometry.getAttribute("uv");
+  const index = mesh.geometry.index;
+
+  if (!position || !uv) return null;
+
+  mesh.updateWorldMatrix(true, false);
+
+  const getVertexIndex = (face: number, corner: number) => {
+    const offset = face * 3 + corner;
+    return index ? index.getX(offset) : offset;
+  };
+
+  let count = 0;
+  let meanU = 0;
+  let meanV = 0;
+  const meanP = new Vector3();
+
+  const samples: Array<{
+    u: number;
+    v: number;
+    p: Vector3;
+  }> = [];
+
+  island.faces.forEach((face) => {
+    for (let corner = 0; corner < 3; corner++) {
+      const vertexIndex = getVertexIndex(face, corner);
+      const u = uv.getX(vertexIndex);
+      const v = uv.getY(vertexIndex);
+      const p = new Vector3(
+        position.getX(vertexIndex),
+        position.getY(vertexIndex),
+        position.getZ(vertexIndex)
+      ).applyMatrix4(mesh.matrixWorld);
+
+      samples.push({ u, v, p });
+      meanU += u;
+      meanV += v;
+      meanP.add(p);
+      count++;
+    }
+  });
+
+  if (count < 3) return null;
+
+  meanU /= count;
+  meanV /= count;
+  meanP.divideScalar(count);
+
+  let suu = 0;
+  let svv = 0;
+  let suv = 0;
+  const sup = new Vector3();
+  const svp = new Vector3();
+
+  samples.forEach(({ u, v, p }) => {
+    const du = u - meanU;
+    const dv = v - meanV;
+    const dp = p.clone().sub(meanP);
+
+    suu += du * du;
+    svv += dv * dv;
+    suv += du * dv;
+    sup.addScaledVector(dp, du);
+    svp.addScaledVector(dp, dv);
+  });
+
+  const determinant = suu * svv - suv * suv;
+  if (Math.abs(determinant) < 1e-10) return null;
+
+  const uAxis = sup
+    .multiplyScalar(svv)
+    .addScaledVector(svp, -suv)
+    .divideScalar(determinant);
+
+  const vAxis = svp
+    .multiplyScalar(suu)
+    .addScaledVector(sup, -suv)
+    .divideScalar(determinant);
+
+  if (uAxis.lengthSq() < 1e-10 || vAxis.lengthSq() < 1e-10) {
+    return null;
+  }
+
+  return {
+    uAxis: uAxis.normalize(),
+    vAxis: vAxis.normalize(),
+  };
+}
+
+interface ArtworkOrientation {
+  rotation: number;
+  flipX: number;
+  flipY: number;
+  rotated: boolean;
+}
+
+/**
+ * Pick the rotation/reflection that makes the artwork's horizontal and
+ * vertical directions agree with the selected panel's viewing direction.
+ */
+function getArtworkOrientation(
+  panel: PanelId,
+  uAxis: Vector3,
+  vAxis: Vector3
+): ArtworkOrientation {
+  const panelDirections: Record<
+    PanelId,
+    { right: Vector3; up: Vector3 }
+  > = {
+    front: {
+      right: new Vector3(1, 0, 0),
+      up: new Vector3(0, 1, 0),
+    },
+    back: {
+      right: new Vector3(-1, 0, 0),
+      up: new Vector3(0, 1, 0),
+    },
+    left: {
+      right: new Vector3(0, 0, 1),
+      up: new Vector3(0, 1, 0),
+    },
+    right: {
+      right: new Vector3(0, 0, -1),
+      up: new Vector3(0, 1, 0),
+    },
+    roof: {
+      right: new Vector3(1, 0, 0),
+      up: new Vector3(0, 0, -1),
+    },
+  };
+
+  const target = panelDirections[panel];
+  const rotations = [
+    {
+      rotation: 0,
+      x: uAxis.clone(),
+      y: vAxis.clone(),
+      rotated: false,
+    },
+    {
+      rotation: Math.PI / 2,
+      x: vAxis.clone().negate(),
+      y: uAxis.clone(),
+      rotated: true,
+    },
+    {
+      rotation: Math.PI,
+      x: uAxis.clone().negate(),
+      y: vAxis.clone().negate(),
+      rotated: false,
+    },
+    {
+      rotation: (Math.PI * 3) / 2,
+      x: vAxis.clone(),
+      y: uAxis.clone().negate(),
+      rotated: true,
+    },
+  ];
+
+  let best = {
+    rotation: 0,
+    flipX: 1,
+    flipY: 1,
+    score: -Infinity,
+    rotated: false,
+  };
+
+  rotations.forEach((candidate) => {
+    [1, -1].forEach((flipX) => {
+      [1, -1].forEach((flipY) => {
+        const score =
+          candidate.x.clone().multiplyScalar(flipX).dot(target.right) +
+          candidate.y.clone().multiplyScalar(flipY).dot(target.up);
+
+        if (score > best.score) {
+          best = {
+            rotation: candidate.rotation,
+            flipX,
+            flipY,
+            score,
+            rotated: candidate.rotated,
+          };
+        }
+      });
+    });
+  });
+
+  // Use the orientation calculated from this island's actual UV/world axes.
+  // Do not add a fixed panel rotation here: it can cancel the UV result.
+  return {
+    rotation: best.rotation,
+    flipX: best.flipX,
+    flipY: best.flipY,
+    rotated: best.rotated,
+  };
+}
+
 /**
  * Draw design only inside the real UV triangles.
  * This prevents artwork from leaking into overlapping UV rectangles.
@@ -354,26 +562,51 @@ function createFabricAtlas(
 
     context.clip();
 
-    // Keep the original artwork proportions. Stretching a logo to fit
-    // every UV island makes circles oval and text visibly distorted.
+    // Read the real UV-to-world direction for this island. Different
+    // tent panels (and roof facets) can have different UV orientations.
+    const uvAxes = getIslandWorldUVAxes(mesh, island);
+    const orientation = uvAxes
+      ? getArtworkOrientation(panel, uvAxes.uAxis, uvAxes.vAxis)
+      : {
+          rotation: 0,
+          flipX: 1,
+          flipY: 1,
+          rotated: false,
+        };
+
+    // A 90/270 degree rotation swaps the available drawing dimensions.
+    const availableWidth = orientation.rotated ? height : width;
+    const availableHeight = orientation.rotated ? width : height;
+
+    // Preserve the uploaded artwork's aspect ratio.
     const imageAspect = image.width / Math.max(image.height, 1);
-    const islandAspect = width / height;
+    const availableAspect =
+      availableWidth / Math.max(availableHeight, 1);
 
-    let drawWidth = width;
-    let drawHeight = height;
+    let drawWidth = availableWidth;
+    let drawHeight = availableHeight;
 
-    if (imageAspect > islandAspect) {
-      drawHeight = width / imageAspect;
+    if (imageAspect > availableAspect) {
+      drawHeight = availableWidth / imageAspect;
     } else {
-      drawWidth = height * imageAspect;
+      drawWidth = availableHeight * imageAspect;
     }
-
-    const drawX = x + (width - drawWidth) / 2;
-    const drawY = y + (height - drawHeight) / 2;
 
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
-    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+
+    // Draw around the UV island center so rotations stay inside its bounds.
+    context.translate(x + width / 2, y + height / 2);
+    context.rotate(orientation.rotation);
+    context.scale(orientation.flipX, orientation.flipY);
+
+    context.drawImage(
+      image,
+      -drawWidth / 2,
+      -drawHeight / 2,
+      drawWidth,
+      drawHeight
+    );
 
     context.restore();
   });

@@ -1,4 +1,3 @@
-
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -19,54 +18,47 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
-      rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+* {
+  box-sizing: border-box;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+html {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: clip;
+  background: #fff;
 }
 
 #root {
   width: 100%;
   max-width: 100%;
+  min-height: 100vh;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-}
-
-body {
-  margin: 0;
 }
 
 h1,
@@ -80,11 +72,6 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
-
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
 }
 
 h2 {
@@ -92,10 +79,6 @@ h2 {
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
-
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
 }
 
 p {
@@ -115,4 +98,539 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #root {
+    border-inline: 0;
+  }
+
+  h1 {
+    font-size: clamp(25px, 7vw, 34px);
+    letter-spacing: -0.8px;
+    margin: 18px 0;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  code {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Small phones */
+@media (max-width: 430px) {
+  :root {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 359px) {
+  :root {
+    font-size: 13px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+}
+/* =========================================================
+   TENT STUDIO RESPONSIVE OVERRIDES
+   Add this block at the END of the main stylesheet.
+   Existing desktop styling is preserved.
+========================================================= */
+
+/* Prevent accidental page-wide horizontal scrolling */
+.app,
+.product-page-grid,
+.product-visual-column,
+.sidebar,
+.configurator,
+.preview-section,
+.design-editor-wrapper,
+.design-editor,
+.editor-layout,
+.editor-canvas-section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.app {
+  overflow-x: clip;
+}
+
+img,
+canvas,
+video,
+input,
+button,
+textarea,
+select {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.product-page-grid > *,
+.editor-layout > * {
+  min-width: 0;
+}
+
+/* Tablet and compact laptop */
+@media (max-width: 1024px) {
+  .product-page-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    gap: 20px;
+    padding-inline: 20px;
+  }
+
+  .preview-container {
+    height: clamp(390px, 52vw, 520px);
+    min-height: 0;
+  }
+
+  .product-options-card {
+    position: static;
+  }
+
+  .design-editor-wrapper {
+    padding-inline: 20px;
+  }
+}
+
+/* Phones and portrait tablets */
+@media (max-width: 760px) {
+  .app-header {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .app-header > div:first-child {
+    min-width: 0;
+    flex: 1 1 180px;
+  }
+
+  .app-header h1 {
+    font-size: clamp(19px, 5vw, 23px);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .app-header p {
+    margin: 5px 0 0;
+    line-height: 1.4;
+  }
+
+  .header-actions {
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .cart-open-button {
+    min-height: 42px;
+    padding: 9px 12px;
+  }
+
+  .product-page-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 14px 12px 30px;
+  }
+
+  .product-visual-column,
+  .product-options-card,
+  .sidebar,
+  .configurator {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .preview-section {
+    border-radius: 4px;
+  }
+
+  .preview-heading {
+    padding: 14px;
+  }
+
+  .preview-heading h2 {
+    font-size: 17px;
+  }
+
+  .preview-container {
+    width: 100%;
+    height: clamp(310px, 92vw, 460px);
+    min-height: 0;
+  }
+
+  .tent-viewer {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .tent-viewer canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    touch-action: pan-y;
+  }
+
+  .panel-selector {
+    padding: 14px;
+  }
+
+  .panel-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .panel-button {
+    min-width: 0;
+    min-height: 42px;
+    padding: 8px 5px;
+    gap: 4px;
+    font-size: 11px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .panel-button span {
+    font-size: 14px;
+  }
+
+  .selected-panel-label {
+    line-height: 1.5;
+  }
+
+  .product-title-block h1 {
+    font-size: clamp(25px, 7vw, 32px);
+  }
+
+  .product-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .setup-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .size-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .setup-option {
+    min-width: 0;
+    padding: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  .product-purchase-row {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .design-editor-wrapper {
+    padding: 0 12px 28px;
+  }
+
+  .design-editor {
+    margin-top: 16px;
+    padding: 16px;
+  }
+
+  .editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .editor-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .editor-field {
+    min-width: 0;
+  }
+
+  .editor-field input[type="text"],
+  .editor-field input[type="file"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .editor-canvas-section {
+    padding: 10px;
+  }
+
+  .design-canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 3;
+  }
+
+  .checkout-page {
+    padding: 18px 12px;
+  }
+
+  .checkout-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .checkout-form-card,
+  .checkout-summary-card,
+  .checkout-success {
+    padding: 18px;
+  }
+}
+
+/* Common narrow phones: 360px to 430px */
+@media (max-width: 430px) {
+  .app-header {
+    padding: 12px;
+  }
+
+  .app-header h1 {
+    font-size: 19px;
+  }
+
+  .cart-open-button {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .product-page-grid {
+    padding-inline: 10px;
+  }
+
+  .preview-heading {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .preview-heading h2 {
+    font-size: 16px;
+  }
+
+  .preview-live-pill {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .preview-container {
+    height: clamp(290px, 88vw, 380px);
+  }
+
+  .panel-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Keep the fifth panel button centered on its own row */
+  .panel-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 4px);
+  }
+
+  .setup-section {
+    padding: 14px;
+  }
+
+  .setup-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .size-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .setup-option {
+    min-height: 54px;
+    padding: 8px 7px;
+  }
+
+  .setup-option strong {
+    font-size: 10px;
+  }
+
+  .setup-option span {
+    font-size: 9px;
+  }
+
+  .product-benefits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-purchase-row {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .product-purchase-row .add-to-cart-button {
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+
+  .design-editor {
+    padding: 13px;
+  }
+
+  .editor-header {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .editor-header h2 {
+    font-size: 18px;
+  }
+
+  .editor-status {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .editor-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor-field input[type="file"] {
+    font-size: 11px;
+  }
+
+  .editor-canvas-section {
+    padding: 8px;
+  }
+
+  .canvas-instruction {
+    line-height: 1.45;
+  }
+
+  .pricing-section {
+    padding: 14px;
+  }
+
+  .price-row,
+  .price-total,
+  .checkout-summary-item,
+  .checkout-summary-total {
+    flex-wrap: wrap;
+  }
+
+  .checkout-form-card h2 {
+    font-size: 23px;
+  }
+}
+
+/* Very small phones: 320px to 359px */
+@media (max-width: 359px) {
+  .app-header {
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .preview-container {
+    height: 280px;
+  }
+
+  .panel-button {
+    font-size: 10px;
+    padding-inline: 4px;
+  }
+
+  .setup-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .size-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .product-price-total {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .product-purchase-row {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .editor-header {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+/* Landscape phones */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
+  .preview-container {
+    height: 72vh;
+    min-height: 250px;
+  }
+
+  .product-page-grid {
+    gap: 14px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
